@@ -68,11 +68,12 @@ public class ScanResult {
     /*
     Print all results
     */
-    public void printAll() {
+    public void printPortResults() {
         this.scanResults.forEach((result) -> {
             System.out.print(result.toString() + "\n");
         });
     }
+
     /*
     Output the object data as a string
     */
