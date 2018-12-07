@@ -13,12 +13,12 @@ public class PortScannerThread implements Callable<LinkedList<PortResult>> {
     private final int timeout;
 
     // Overloaded constructors:
-    
+
     /**
      * Constructor with no timeout specified
      * @param hostname
      * @param startPort
-     * @param endPort 
+     * @param endPort
      */
     public PortScannerThread(String hostname, int startPort, int endPort) {
         this(hostname, startPort, endPort, 200);
