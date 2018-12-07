@@ -1,8 +1,0 @@
-<component name="ArtifactManager">
-  <artifact type="jar" name="MADPortsAPI:jar">
-    <output-path>$PROJECT_DIR$/classes/artifacts/MADPortsAPI_jar</output-path>
-    <root id="archive" name="MADPortsAPI.jar">
-      <element id="module-output" name="MADPortsAPI" />
-    </root>
-  </artifact>
-</component>
