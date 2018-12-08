@@ -4,6 +4,7 @@ import com.madhax.madportsapi.model.ScanResult;
 import com.madhax.madportsapi.model.PortResult;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.LinkedList;
@@ -185,6 +186,17 @@ public abstract class PortScanner {
                 portResults);
 
         return scanResults;
+    }
+
+    public static String hostnameLookup(String hostAddress) {
+        String hostName = "";
+        try {
+            InetAddress address = InetAddress.getByName(hostAddress);
+            hostName = address.getCanonicalHostName(); // force DNS lookup
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return hostName;
     }
 
     /**
