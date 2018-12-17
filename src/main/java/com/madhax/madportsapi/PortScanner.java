@@ -148,21 +148,19 @@ public abstract class PortScanner {
             startingPortForThread += portInterval;
             endingPortForThread += portInterval;
 
-            System.out.println("LOADED THREAD #: " + i);
         }
 
         // Record the start time of the scan
         long startTime = new Date().getTime();
 
         // run the threads by submitting the tasks to the pool
-        for (int i = 0; i < tasks.length; i++) {
-            System.out.println("TASK INDEX: " + i);
+        for (int i = 0; i < totalThreads; i++) {
             future[i] = pool.submit(tasks[i]);
         }
 
         LinkedList<PortResult> portResults = new LinkedList<>(); // Stores all scanned port results
         // Access the Future to get the ordered results of our scan
-        for (int i = 0; i < future.length; i++) {
+        for (int i = 0; i < totalThreads; i++) {
             try {
                 portResults.addAll(future[i].get());
             } catch (Exception e) {
