@@ -67,20 +67,16 @@ public abstract class PortScanner {
 
         LinkedList<PortResult> portResults = new LinkedList<>();
 
-        // Ensure input is valid
         if (validPortRange(startPort, endPort) && !hostname.isEmpty()) {
-
             // iterate through the ports
             for (int port = startPort; port <= endPort; port++) {
                 portResults.add(scanPort(hostname, port, timeout));
             }
-
             return portResults;
-
         } else { // if port is beyond max range, break loop
             System.err.println("Error! Ports are out of range: " + startPort + "-" + endPort);
             return null;
-        } // END input validation conditionalt
+        } // END input validation conditional
 
     }
     
@@ -115,55 +111,58 @@ public abstract class PortScanner {
     /**
      * All parameters provided
      * @param hostname
-     * @param startinPortForScan
+     * @param startingPortForScan
      * @param endingPortForScan
      * @param timeout
      * @param totalThreads
      * @return
      */
-    public static ScanResult multiThreadedScan(String hostname, int startinPortForScan, int endingPortForScan, int timeout, int totalThreads) {
+    public static ScanResult multiThreadedScan(String hostname, int startingPortForScan, int endingPortForScan, int timeout, int totalThreads) {
 
         // if port range is invalid, exit the method
-        if (!validPortRange(startinPortForScan, endingPortForScan)) {
-            System.err.println("Invalid port range: " + startinPortForScan + "- " + endingPortForScan);
+        if (!validPortRange(startingPortForScan, endingPortForScan)) {
+            System.err.println("Invalid port range: " + startingPortForScan + "- " + endingPortForScan);
             return null;
         }
 
-        totalThreads = validateThreadCount(totalPortsInRange(startinPortForScan, endingPortForScan), totalThreads);
+        totalThreads = validateThreadCount(totalPortsInRange(startingPortForScan, endingPortForScan), totalThreads);
 
         ExecutorService pool = Executors.newFixedThreadPool(totalThreads);
         PortScannerThread[] tasks = new PortScannerThread[totalThreads];
         Future<LinkedList<PortResult>>[] future = new Future[totalThreads];
 
-        int portInterval = determinePortInterval(startinPortForScan, endingPortForScan, totalThreads);
-        int startingPortForThread = startinPortForScan;
-        int endingPortForThread = startinPortForScan + portInterval;
+        int portInterval = determinePortInterval(startingPortForScan, endingPortForScan, totalThreads);
+        int startingPortForThread = startingPortForScan;
+        int endingPortForThread = startingPortForScan + portInterval;
 
         // load the threads
         for (int i = 0; i < totalThreads; i++) {
 
-            tasks[i] = new PortScannerThread(hostname, startingPortForThread, endingPortForThread, timeout);
-
-            // Update the port range for next thread
-            startingPortForThread += portInterval + 1;
-            endingPortForThread += portInterval + 1;
-
             if (endingPortForThread > endingPortForScan) {
                 endingPortForThread = endingPortForScan;
             }
+
+            tasks[i] = new PortScannerThread(hostname, startingPortForThread, endingPortForThread, timeout);
+
+            // Update the port range for next thread
+            startingPortForThread += portInterval;
+            endingPortForThread += portInterval;
+
+            System.out.println("LOADED THREAD #: " + i);
         }
 
         // Record the start time of the scan
         long startTime = new Date().getTime();
 
         // run the threads by submitting the tasks to the pool
-        for (int i = 0; i < totalThreads; i++) {
+        for (int i = 0; i < tasks.length; i++) {
+            System.out.println("TASK INDEX: " + i);
             future[i] = pool.submit(tasks[i]);
         }
 
         LinkedList<PortResult> portResults = new LinkedList<>(); // Stores all scanned port results
         // Access the Future to get the ordered results of our scan
-        for (int i = 0; i < totalThreads; i++) {
+        for (int i = 0; i < future.length; i++) {
             try {
                 portResults.addAll(future[i].get());
             } catch (Exception e) {
@@ -177,7 +176,7 @@ public abstract class PortScanner {
         long endTime = new Date().getTime();
 
         ScanResult scanResults = new ScanResult(hostname,
-                startinPortForScan,
+                startingPortForScan,
                 endingPortForScan,
                 timeout,
                 totalThreads,
@@ -249,8 +248,12 @@ public abstract class PortScanner {
      * @param threadCount
      * @return
      */
-    private static int determinePortInterval(int startPort, int endPort, int threadCount) {
-        return (totalPortsInRange(startPort, endPort) / threadCount) + 1;
+    public static int determinePortInterval(int startPort, int endPort, int threadCount) {
+        if ( (totalPortsInRange(startPort, endPort) % threadCount) == 0) {
+            return (totalPortsInRange(startPort, endPort) / threadCount);
+        } else {
+            return (totalPortsInRange(startPort, endPort) / threadCount) + 1;
+        }
     }
 
 } // END PortScannerController class
