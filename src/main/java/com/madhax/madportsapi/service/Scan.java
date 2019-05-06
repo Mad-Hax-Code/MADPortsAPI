@@ -11,7 +11,7 @@ import java.util.concurrent.ExecutionException;
 
 public class Scan {
 
-    public static ScanResult scanPorts(
+    public static CompletableFuture<ScanResult> scanPorts(
             String hostname,
             int startPort,
             int endPort,
@@ -27,7 +27,7 @@ public class Scan {
                 0);
     }
 
-    public static ScanResult scanPorts(
+    public static CompletableFuture<ScanResult> scanPorts(
             String hostname,
             int startPort,
             int endPort,
@@ -58,7 +58,7 @@ public class Scan {
                     portResults);
         });
 
-        return completableFuture.get();
+        return completableFuture;
     }
 
 }
